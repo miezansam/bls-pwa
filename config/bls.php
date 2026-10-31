@@ -16,4 +16,7 @@ return [
     'mobile_money_actif' => false,
 
     'code_livraison_max_tentatives' => 5,
+
+    // Délai laissé à un livreur pour répondre à une offre de course
+    'delai_reponse_attribution_minutes' => 5,
 ];

@@ -17,6 +17,7 @@ use App\Models\ProfilLivreur;
 use App\Models\Utilisateur;
 use InvalidArgumentException;
 use Illuminate\Support\Facades\DB;
+use App\Enums\StatutAttribution;
 
 final class ChangerStatutCommandeAction
 {
@@ -81,6 +82,7 @@ final class ChangerStatutCommandeAction
 
             if ($nouveauStatut === StatutCommande::Annulee) {
                 $this->annulerPaiementEnAttente($verrouillee);
+                $this->cloturerOffresEnCours($verrouillee);
             }
 
             $this->mettreAJourStatutLivreur($nouveauStatut, $livreur?->id ?? $livreurIdActuel);
@@ -150,5 +152,12 @@ final class ChangerStatutCommandeAction
         ) {
             $profil->update(['statut' => StatutLivreur::Disponible]);
         }
+    }
+
+    private function cloturerOffresEnCours(Commande $commande): void
+    {
+        $commande->attributions()
+            ->where('statut', StatutAttribution::Proposee->value)
+            ->update(['statut' => StatutAttribution::Annulee->value]);
     }
 }
