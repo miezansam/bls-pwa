@@ -10,9 +10,11 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        $this->call([
-            RolesSeeder::class,
-            // ZonesSeeder et TarifsSeeder viendront à l'étape 2
-        ]);
+        $this->call(RolesSeeder::class);
+
+        // Les zones et prix d'exemple ne doivent jamais arriver en production
+        if (app()->environment(['local', 'testing'])) {
+            $this->call(ZonesEtTarifsSeeder::class);
+        }
     }
 }

@@ -19,16 +19,44 @@ class Commande extends Model
     protected $table = 'commandes';
 
     protected $fillable = [
-        'reference', 'client_id', 'livreur_id', 'type', 'statut',
-        'retrait_adresse_id', 'retrait_zone_id', 'retrait_latitude', 'retrait_longitude',
-        'retrait_repere', 'retrait_contact_nom', 'retrait_contact_telephone',
-        'livraison_adresse_id', 'livraison_zone_id', 'livraison_latitude', 'livraison_longitude',
-        'livraison_repere', 'livraison_contact_nom', 'livraison_contact_telephone',
-        'description', 'photo_chemin', 'note_livreur',
-        'distance_m', 'duree_estimee_s', 'frais_livraison', 'montant_articles', 'montant_total',
-        'mode_paiement', 'statut_paiement', 'code_livraison', 'code_livraison_tentatives',
-        'attribuee_le', 'acceptee_le', 'recuperee_le', 'livree_le',
-        'annulee_le', 'annulee_par', 'motif_annulation',
+        'reference',
+        'client_id',
+        'livreur_id',
+        'type',
+        'statut',
+        'retrait_adresse_id',
+        'retrait_zone_id',
+        'retrait_latitude',
+        'retrait_longitude',
+        'retrait_repere',
+        'retrait_contact_nom',
+        'retrait_contact_telephone',
+        'livraison_adresse_id',
+        'livraison_zone_id',
+        'livraison_latitude',
+        'livraison_longitude',
+        'livraison_repere',
+        'livraison_contact_nom',
+        'livraison_contact_telephone',
+        'description',
+        'photo_chemin',
+        'note_livreur',
+        'distance_m',
+        'duree_estimee_s',
+        'frais_livraison',
+        'montant_articles',
+        'montant_total',
+        'mode_paiement',
+        'statut_paiement',
+        'code_livraison',
+        'code_livraison_tentatives',
+        'attribuee_le',
+        'acceptee_le',
+        'recuperee_le',
+        'livree_le',
+        'annulee_le',
+        'annulee_par',
+        'motif_annulation',
     ];
 
     /** Le code de livraison ne doit jamais fuiter vers le livreur via l'API. */
@@ -96,7 +124,9 @@ class Commande extends Model
 
     public function historiqueStatuts(): HasMany
     {
-        return $this->hasMany(HistoriqueStatut::class, 'commande_id')->orderBy('created_at');
+        return $this->hasMany(HistoriqueStatut::class, 'commande_id')
+            ->orderBy('created_at')
+            ->orderBy('id');
     }
 
     public function attributions(): HasMany
