@@ -110,3 +110,46 @@ function creerOption(
         'montant' => $montant,
     ], $surcharges));
 }
+/** Remplace l'envoi réel de SMS par un enregistreur, et permet de relire le dernier code envoyé. */
+function smsFictif(): object
+{
+    $fictif = new class () implements \App\Services\Sms\EnvoyeurSms {
+        /** @var list<array{telephone: string, message: string}> */
+        public array $messages = [];
+
+        public bool $echouer = false;
+
+        public function envoyer(string $telephone, string $message): void
+        {
+            if ($this->echouer) {
+                throw new \RuntimeException('Fournisseur SMS indisponible');
+            }
+
+            $this->messages[] = ['telephone' => $telephone, 'message' => $message];
+        }
+
+        public function dernierCode(): string
+        {
+            $dernier = end($this->messages);
+            preg_match('/\b(\d{6})\b/', (string) ($dernier['message'] ?? ''), $trouve);
+
+            return $trouve[1] ?? '';
+        }
+    };
+
+    app()->instance(\App\Services\Sms\EnvoyeurSms::class, $fictif);
+
+    return $fictif;
+}
+
+/** Retourne le motif de l'erreur d'authentification lancée par l'action, ou « aucun_echec ». */
+function motifDeLEchec(Closure $action): string
+{
+    try {
+        $action();
+    } catch (\App\Exceptions\AuthentificationException $e) {
+        return $e->motif;
+    }
+
+    return 'aucun_echec';
+}

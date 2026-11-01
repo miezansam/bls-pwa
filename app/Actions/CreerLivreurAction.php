@@ -11,6 +11,8 @@ use App\Models\Utilisateur;
 use DomainException;
 use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Role;
+use App\Exceptions\AuthentificationException;
+use App\Support\Telephone;
 
 final class CreerLivreurAction
 {
@@ -19,7 +21,8 @@ final class CreerLivreurAction
      */
     public function executer(array $donnees): ProfilLivreur
     {
-        $telephone = (string) $donnees['telephone'];
+        $telephone = Telephone::normaliser((string) $donnees['telephone'])
+            ?? throw AuthentificationException::telephoneInvalide();
 
         // Les comptes supprimés comptent aussi : l'index unique de la base les inclut
         if (Utilisateur::withTrashed()->where('telephone', $telephone)->exists()) {

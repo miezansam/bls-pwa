@@ -28,6 +28,9 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use App\Models\Utilisateur;
+use App\Support\Telephone;
+use Closure;
 
 class LivreurResource extends Resource
 {
@@ -59,9 +62,20 @@ class LivreurResource extends Resource
                 ->label('Téléphone')
                 ->tel()
                 ->required()
-                ->regex('/^\+\d{8,15}$/')
-                ->unique('utilisateurs', 'telephone')
-                ->helperText('Format international sans espaces, ex : +2250700000000. Non modifiable ensuite.')
+                ->rule(fn () => function (string $attribute, mixed $value, Closure $fail): void {
+                    $telephone = Telephone::normaliser((string) $value);
+
+                    if ($telephone === null) {
+                        $fail('Numéro invalide : 10 chiffres, par exemple 07 00 00 00 00.');
+
+                        return;
+                    }
+
+                    if (Utilisateur::withTrashed()->where('telephone', $telephone)->exists()) {
+                        $fail('Ce numéro est déjà utilisé.');
+                    }
+                })
+                ->helperText('10 chiffres, par exemple 07 00 00 00 00. Non modifiable ensuite.')
                 ->visibleOn(Operation::Create),
             Select::make('type_vehicule')
                 ->label('Véhicule')

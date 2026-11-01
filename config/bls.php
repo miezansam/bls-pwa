@@ -26,4 +26,18 @@ return [
         'email' => env('DEV_ADMIN_EMAIL'),
         'mot_de_passe' => env('DEV_ADMIN_PASSWORD'),
     ],
+
+    // Connexion par code SMS (OTP)
+    'otp' => [
+        'longueur' => 6,
+        'duree_minutes' => 5,
+        'tentatives_max' => 5,
+        'delai_renvoi_secondes' => 60,
+        'codes_max_par_heure' => 5,
+    ],
+
+    // Envoi des SMS. « journal » écrit dans les logs : réservé au développement.
+    'sms' => [
+        'driver' => env('SMS_DRIVER', 'journal'),
+    ],
 ];

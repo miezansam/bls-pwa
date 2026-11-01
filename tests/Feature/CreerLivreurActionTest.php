@@ -56,3 +56,24 @@ test('le numéro d\'un compte supprimé reste réservé', function () {
     expect(fn () => app(CreerLivreurAction::class)->executer(donneesLivreur()))
         ->toThrow(DomainException::class);
 });
+
+test('le numéro saisi librement est enregistré au format international', function () {
+    $profil = app(CreerLivreurAction::class)->executer(donneesLivreur(['telephone' => '07 00 00 01 23']));
+
+    expect($profil->utilisateur->telephone)->toBe('+2250700000123');
+});
+
+test('un numéro invalide est refusé à la création d\'un livreur', function () {
+    expect(fn () => app(CreerLivreurAction::class)->executer(donneesLivreur(['telephone' => '12345'])))
+        ->toThrow(DomainException::class, 'invalide');
+
+    expect(Utilisateur::count())->toBe(0);
+});
+
+test('un numéro déjà utilisé est détecté quel que soit son format', function () {
+    $creer = app(CreerLivreurAction::class);
+    $creer->executer(donneesLivreur(['telephone' => '+2250700000123']));
+
+    expect(fn () => $creer->executer(donneesLivreur(['nom' => 'Autre', 'telephone' => '07 00 00 01 23'])))
+        ->toThrow(DomainException::class, 'déjà utilisé');
+});

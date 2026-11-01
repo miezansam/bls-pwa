@@ -94,4 +94,10 @@ class Utilisateur extends Authenticatable implements FilamentUser, HasName
     {
         return $this->nom;
     }
+
+    /** Seuls les clients et les livreurs utilisent l'application ; l'admin passe par /admin. */
+    public function aAccesALApplication(): bool
+    {
+        return $this->hasAnyRole([RoleUtilisateur::Client->value, RoleUtilisateur::Livreur->value]);
+    }
 }
