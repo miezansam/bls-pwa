@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace App\Enums;
 
-enum StatutCommande: string
+use Filament\Support\Contracts\HasColor;
+use Filament\Support\Contracts\HasLabel;
+
+enum StatutCommande: string implements HasColor, HasLabel
 {
     case EnAttente = 'en_attente';
     case Acceptee = 'acceptee';
@@ -70,5 +73,15 @@ enum StatutCommande: string
             self::ColisRecupere,
             self::EnRouteLivraison,
         ], true);
+    }
+
+    public function getLabel(): string
+    {
+        return $this->libelle();
+    }
+
+    public function getColor(): string
+    {
+        return $this->couleur();
     }
 }

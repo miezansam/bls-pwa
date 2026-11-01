@@ -11,8 +11,12 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
+use App\Enums\RoleUtilisateur;
+use Filament\Models\Contracts\FilamentUser;
+use Filament\Models\Contracts\HasName;
+use Filament\Panel;
 
-class Utilisateur extends Authenticatable
+class Utilisateur extends Authenticatable implements FilamentUser, HasName
 {
     use HasFactory;
     use HasRoles;
@@ -22,8 +26,15 @@ class Utilisateur extends Authenticatable
     protected $table = 'utilisateurs';
 
     protected $fillable = [
-        'nom', 'telephone', 'telephone_verifie_le', 'email', 'password',
-        'avatar_chemin', 'langue', 'est_actif', 'derniere_connexion_le',
+        'nom',
+        'telephone',
+        'telephone_verifie_le',
+        'email',
+        'password',
+        'avatar_chemin',
+        'langue',
+        'est_actif',
+        'derniere_connexion_le',
     ];
 
     protected $hidden = ['password', 'remember_token'];
@@ -68,5 +79,19 @@ class Utilisateur extends Authenticatable
     public function reversementsCaisse(): HasMany
     {
         return $this->hasMany(ReversementCaisse::class, 'livreur_id');
+    }
+
+    public function canAccessPanel(Panel $panel): bool
+    {
+        return match ($panel->getId()) {
+            'admin' => $this->est_actif && $this->hasRole(RoleUtilisateur::Admin->value),
+            default => false,
+        };
+    }
+
+    /** Filament affiche `name` par défaut : notre colonne s'appelle `nom`. */
+    public function getFilamentName(): string
+    {
+        return $this->nom;
     }
 }

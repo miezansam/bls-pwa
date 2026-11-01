@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Enums;
 
-enum ModePaiement: string
+use Filament\Support\Contracts\HasLabel;
+
+enum ModePaiement: string implements HasLabel
 {
     case Especes = 'especes';
     case Wave = 'wave';
@@ -26,5 +28,10 @@ enum ModePaiement: string
     public function estMobileMoney(): bool
     {
         return $this !== self::Especes;
+    }
+
+    public function getLabel(): string
+    {
+        return $this->libelle();
     }
 }

@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Enums;
 
-enum TypeCommande: string
+use Filament\Support\Contracts\HasLabel;
+
+enum TypeCommande: string implements HasLabel
 {
     case Colis = 'colis';
     case Repas = 'repas';
@@ -15,5 +17,10 @@ enum TypeCommande: string
             self::Colis => 'Colis',
             self::Repas => 'Repas',
         };
+    }
+
+    public function getLabel(): string
+    {
+        return $this->libelle();
     }
 }
