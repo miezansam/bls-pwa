@@ -121,7 +121,7 @@ final class CommandesTable
     private static function livreursProposables(): array
     {
         return Utilisateur::query()
-            ->role(RoleUtilisateur::Livreur->value)
+            ->whereHas('roles', fn (Builder $q) => $q->where('name', RoleUtilisateur::Livreur->value))
             ->where('est_actif', true)
             ->whereHas('profilLivreur', fn (Builder $q) => $q
                 ->where('est_valide', true)

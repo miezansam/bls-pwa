@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Enums;
 
-enum TypeVehicule: string
+use Filament\Support\Contracts\HasLabel;
+
+enum TypeVehicule: string implements HasLabel
 {
     case Moto = 'moto';
     case Velo = 'velo';
@@ -19,5 +21,10 @@ enum TypeVehicule: string
             self::Voiture => 'Voiture',
             self::Pieton => 'À pied',
         };
+    }
+
+    public function getLabel(): string
+    {
+        return $this->libelle();
     }
 }

@@ -57,6 +57,8 @@ class Commande extends Model
         'annulee_le',
         'annulee_par',
         'motif_annulation',
+        'nombre_repas',
+        'detail_prix'
     ];
 
     /** Le code de livraison ne doit jamais fuiter vers le livreur via l'API. */
@@ -84,6 +86,8 @@ class Commande extends Model
             'recuperee_le' => 'datetime',
             'livree_le' => 'datetime',
             'annulee_le' => 'datetime',
+            'nombre_repas' => 'integer',
+            'detail_prix' => 'array',
         ];
     }
 

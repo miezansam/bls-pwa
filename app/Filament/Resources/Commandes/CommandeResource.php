@@ -17,6 +17,8 @@ use Filament\Tables\Table;
 
 class CommandeResource extends Resource
 {
+    protected static ?int $navigationSort = 1;
+
     protected static ?string $model = Commande::class;
 
     protected static ?string $recordTitleAttribute = 'reference';

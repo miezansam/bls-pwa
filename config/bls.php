@@ -19,4 +19,11 @@ return [
 
     // Délai laissé à un livreur pour répondre à une offre de course
     'delai_reponse_attribution_minutes' => 5,
+
+    // Compte administrateur créé automatiquement en LOCAL par le seeder de démonstration.
+    // Les valeurs viennent du .env (jamais versionné).
+    'dev_admin' => [
+        'email' => env('DEV_ADMIN_EMAIL'),
+        'mot_de_passe' => env('DEV_ADMIN_PASSWORD'),
+    ],
 ];

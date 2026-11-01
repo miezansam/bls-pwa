@@ -86,3 +86,27 @@ function courseEnRouteLivraison(int $frais = 800): array
 
     return [$commande, $livreur];
 }
+
+function creerZoneAvecFrais(string $nom, ?int $frais, bool $active = true, bool $nuit = true): \App\Models\Zone
+{
+    return \App\Models\Zone::create([
+        'nom' => $nom,
+        'slug' => \Illuminate\Support\Str::slug($nom),
+        'frais_livraison' => $frais,
+        'accepte_livraison_nuit' => $nuit,
+        'est_active' => $active,
+    ]);
+}
+
+function creerOption(
+    \App\Enums\CodeOption $code,
+    int $montant = 1000,
+    \App\Enums\RegleOption $regle = \App\Enums\RegleOption::Minimum,
+    array $surcharges = [],
+): \App\Models\OptionTarifaire {
+    return \App\Models\OptionTarifaire::create(array_merge([
+        'code' => $code,
+        'regle' => $regle,
+        'montant' => $montant,
+    ], $surcharges));
+}

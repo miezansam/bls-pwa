@@ -10,11 +10,15 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        $this->call(RolesSeeder::class);
+        // Données réelles : valables dans tous les environnements, production comprise
+        $this->call([
+            RolesSeeder::class,
+            TarifsOfficielsSeeder::class,
+        ]);
 
-        // Les zones et prix d'exemple ne doivent jamais arriver en production
-        if (app()->environment(['local', 'testing'])) {
-            $this->call(ZonesEtTarifsSeeder::class);
+        // Données fictives : jamais en production
+        if (app()->environment('local')) {
+            $this->call(DonneesDemoSeeder::class);
         }
     }
 }

@@ -16,6 +16,7 @@ use App\Models\Utilisateur;
 use App\Services\CalculerPrixService;
 use DomainException;
 use Illuminate\Support\Facades\DB;
+use App\Data\OptionsCommande;
 
 final class CreerCommandeAction
 {
@@ -31,6 +32,10 @@ final class CreerCommandeAction
      *     description: string,
      *     photo_chemin: ?string,
      *     mode_paiement: ModePaiement,
+     *     express?: bool,
+     *     double_course?: bool,
+     *     speciale?: bool,
+     *     nombre_repas?: int,
      *     montant_articles: int,
      * } $donnees  Données déjà validées (Form Request)
      */
@@ -50,6 +55,7 @@ final class CreerCommandeAction
         $retrait = $donnees['retrait'];
         $livraison = $donnees['livraison'];
         $montantArticles = $type === TypeCommande::Repas ? $donnees['montant_articles'] : 0;
+        $nombreRepas = $type === TypeCommande::Repas ? max(1, (int) ($donnees['nombre_repas'] ?? 1)) : 1;
 
         $estimation = $this->prix->estimer(
             type: $type,
@@ -59,11 +65,17 @@ final class CreerCommandeAction
             retraitLongitude: $retrait['longitude'],
             livraisonLatitude: $livraison['latitude'],
             livraisonLongitude: $livraison['longitude'],
+            options: new OptionsCommande(
+                express: (bool) ($donnees['express'] ?? false),
+                doubleCourse: (bool) ($donnees['double_course'] ?? false),
+                speciale: (bool) ($donnees['speciale'] ?? false),
+                nombreRepas: $nombreRepas,
+            ),
         );
 
         $montantTotal = $estimation->fraisLivraison + $montantArticles;
 
-        return DB::transaction(function () use ($client, $donnees, $type, $mode, $retrait, $livraison, $montantArticles, $estimation, $montantTotal) {
+        return DB::transaction(function () use ($client, $donnees, $type, $mode, $retrait, $livraison, $montantArticles, $nombreRepas, $estimation, $montantTotal) {
             $commande = Commande::create([
                 'reference' => $this->genererReference(),
                 'client_id' => $client->id,
@@ -93,6 +105,8 @@ final class CreerCommandeAction
                 'duree_estimee_s' => $estimation->dureeEstimeeS,
                 'frais_livraison' => $estimation->fraisLivraison,
                 'montant_articles' => $montantArticles,
+                'nombre_repas' => $nombreRepas,
+                'detail_prix' => $estimation->detail,
                 'montant_total' => $montantTotal,
 
                 'mode_paiement' => $mode,
