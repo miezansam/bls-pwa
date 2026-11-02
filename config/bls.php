@@ -34,6 +34,8 @@ return [
         'tentatives_max' => 5,
         'delai_renvoi_secondes' => 60,
         'codes_max_par_heure' => 5,
+        'ip_demandes_max_par_heure' => 10,
+        'ip_verifications_max_par_heure' => 30,
     ],
 
     // Envoi des SMS. « journal » écrit dans les logs : réservé au développement.

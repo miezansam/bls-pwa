@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services\Sms;
 
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use RuntimeException;
 
@@ -19,5 +20,10 @@ final class EnvoyeurSmsJournal implements EnvoyeurSms
         }
 
         Log::info("SMS vers {$telephone} : {$message}");
+
+        // Permet d'afficher le SMS à l'écran en local, pour tester depuis un téléphone
+        if (app()->environment('local')) {
+            Cache::put("sms-dev:{$telephone}", $message, now()->addMinutes(10));
+        }
     }
 }
