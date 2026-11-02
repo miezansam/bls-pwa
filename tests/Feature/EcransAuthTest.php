@@ -199,3 +199,17 @@ test('la déconnexion ferme la session', function () {
 
     $this->assertGuest();
 });
+
+test('la page d\'inscription annonce le prix le plus bas de livraison', function () {
+    creerZoneAvecFrais('Ville', 500);
+    creerZoneAvecFrais('Agou', 2000);
+
+    $this->get('/inscription')->assertOk()->assertSee('500')->assertDontSee('2 000');
+});
+
+test('une zone désactivée n\'entre pas dans le prix annoncé', function () {
+    creerZoneAvecFrais('Ville', 500);
+    creerZoneAvecFrais('Zone fermée', 350, active: false);
+
+    $this->get('/inscription')->assertOk()->assertSee('500')->assertDontSee('350');
+});

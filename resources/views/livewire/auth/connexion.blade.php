@@ -1,31 +1,25 @@
-<div>
+<div class="flex flex-1 flex-col lg:flex-none">
     @if ($etape === 'telephone')
-        <form wire:submit="demanderCode" class="space-y-5">
-            <div>
-                <h1 class="text-2xl font-bold">Connexion</h1>
-                <p class="mt-1 text-gray-600">Entrez votre numéro : nous vous envoyons un code par SMS.</p>
+        <form wire:submit="demanderCode" class="flex flex-1 flex-col lg:flex-none" novalidate>
+            <div class="flex-1 space-y-6 px-5 pt-8 lg:flex-none lg:px-0 lg:pt-0">
+                <div>
+                    <h1 class="font-display text-4xl font-bold leading-none">Connexion</h1>
+                    <p class="mt-3 text-lg text-gris">Entrez votre numéro. Nous vous envoyons un code par SMS.</p>
+                </div>
+
+                <x-ui.champ nom="telephone" label="Votre numéro de téléphone" prefixe="+225"
+                            type="tel" inputmode="tel" autocomplete="tel" placeholder="07 00 00 00 00"
+                            wire:model="telephone" :erreur="$errors->first('telephone')" autofocus />
             </div>
 
-            <div>
-                <label for="telephone" class="block text-base font-semibold">Votre numéro de téléphone</label>
-                <input id="telephone" type="tel" inputmode="tel" autocomplete="tel" wire:model="telephone"
-                       placeholder="07 00 00 00 00" autofocus
-                       class="mt-2 block w-full rounded-xl border-2 border-gray-300 px-4 py-4 text-xl focus:border-green-600 focus:outline-none">
-                @error('telephone')
-                    <p class="mt-2 text-base font-medium text-red-700" role="alert">{{ $message }}</p>
-                @enderror
-            </div>
+            <x-ui.barre-action>
+                <x-ui.bouton cible="demanderCode">Recevoir mon code</x-ui.bouton>
 
-            <button type="submit" wire:loading.attr="disabled"
-                    class="w-full rounded-xl bg-green-700 px-4 py-4 text-lg font-semibold text-white active:bg-green-800 disabled:opacity-60">
-                <span wire:loading.remove wire:target="demanderCode">Recevoir mon code</span>
-                <span wire:loading wire:target="demanderCode">Envoi en cours…</span>
-            </button>
-
-            <p class="text-center text-base text-gray-600">
-                Pas encore de compte ?
-                <a href="{{ route('inscription') }}" class="font-semibold text-green-800 underline">Créer mon compte</a>
-            </p>
+                <p class="mt-4 text-center text-base text-gris">
+                    Pas encore de compte ?
+                    <a href="{{ route('inscription') }}" class="font-semibold text-marque underline underline-offset-4">Créer mon compte</a>
+                </p>
+            </x-ui.barre-action>
         </form>
     @else
         @include('livewire.auth.saisie-code')

@@ -3,24 +3,25 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <meta name="theme-color" content="#15803d">
+    <meta name="theme-color" content="#ffc20e">
     <title>{{ $title ?? 'BLS Livraison' }}</title>
-    <style>[x-cloak] { display: none !important; }</style>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="min-h-screen bg-gray-50 text-gray-900 antialiased">
-    <header class="flex items-center justify-between bg-green-700 px-4 py-3 text-white">
-        <span class="text-lg font-bold">BLS Livraison</span>
+<body class="min-h-dvh bg-fond">
+    <header class="bg-signal">
+        <div class="mx-auto flex max-w-2xl items-center justify-between px-5 py-3">
+            <x-logo class="h-8 text-2xl" />
 
-        <form method="POST" action="{{ route('deconnexion') }}">
-            @csrf
-            <button type="submit" class="rounded-lg bg-white/15 px-3 py-2 text-sm font-semibold active:bg-white/25">
-                Déconnexion
-            </button>
-        </form>
+            <form method="POST" action="{{ route('deconnexion') }}">
+                @csrf
+                <button type="submit" class="min-h-11 rounded-lg px-3 text-base font-semibold underline underline-offset-4 active:bg-black/10">
+                    Se déconnecter
+                </button>
+            </form>
+        </div>
     </header>
 
-    <main class="mx-auto w-full max-w-md px-4 py-6">
+    <main class="mx-auto w-full max-w-2xl px-5 py-6">
         {{ $slot }}
     </main>
 </body>

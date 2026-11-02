@@ -3,21 +3,29 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <meta name="theme-color" content="#15803d">
+    <meta name="theme-color" content="#ffc20e">
     <title>{{ $title ?? 'BLS Livraison' }}</title>
-    <style>[x-cloak] { display: none !important; }</style>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="min-h-screen bg-green-50 text-gray-900 antialiased">
-    <main class="mx-auto flex min-h-screen w-full max-w-md flex-col justify-center px-5 py-8">
-        <div class="mb-8 text-center">
-            <p class="text-3xl font-extrabold tracking-tight text-green-800">BLS Livraison</p>
-            <p class="mt-1 text-base text-gray-600">Colis et repas à Adzopé</p>
-        </div>
+<body class="min-h-dvh bg-white lg:grid lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
+    <aside class="hidden bg-marque p-12 text-white lg:flex lg:flex-col lg:justify-between">
+        <x-logo surFond="sombre" class="h-12 text-4xl" />
 
-        <div class="rounded-2xl bg-white p-6 shadow-md">
+        <p class="max-w-md font-display text-5xl font-bold leading-tight">
+            Colis et repas livrés à Adzopé et dans les villages voisins.
+        </p>
+
+        <x-apercu-tarifs />
+    </aside>
+
+    <div class="flex min-h-dvh flex-col">
+        <header class="bg-signal px-5 py-4 lg:hidden">
+            <x-logo class="h-9 text-3xl" />
+        </header>
+
+        <main class="mx-auto flex w-full max-w-md flex-1 flex-col lg:justify-center lg:py-12">
             {{ $slot }}
-        </div>
-    </main>
+        </main>
+    </div>
 </body>
 </html>
