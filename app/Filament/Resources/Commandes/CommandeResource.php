@@ -87,6 +87,7 @@ class CommandeResource extends Resource
                     TextEntry::make('distance_m')->label('Distance estimée')->formatStateUsing(fn ($state): ?string => Format::kilometres($state))->placeholder('Inconnue'),
                     TextEntry::make('mode_paiement')->label('Mode de paiement')->badge(),
                     TextEntry::make('statut_paiement')->label('Statut du paiement')->badge(),
+                    TextEntry::make('code_livraison_tentatives')->label('Essais de code de livraison'),
                 ])
                 ->columns(2),
         ]);
