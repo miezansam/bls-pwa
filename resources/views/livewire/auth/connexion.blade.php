@@ -17,7 +17,7 @@
 
                 <p class="mt-4 text-center text-base text-gris">
                     Pas encore de compte ?
-                    <a href="{{ route('inscription') }}" class="font-semibold text-marque underline underline-offset-4">Créer mon compte</a>
+                    <a href="{{ route('inscription') }}" class="font-semibold text-marine underline underline-offset-4">Créer mon compte</a>
                 </p>
             </x-ui.barre-action>
         </form>

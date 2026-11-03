@@ -47,4 +47,6 @@ return [
         'marine' => '#011F48',
         'ambre' => '#F1AE06',
     ],
+
+    'centre_defaut' => ['latitude' => 6.1067, 'longitude' => -3.8606],
 ];

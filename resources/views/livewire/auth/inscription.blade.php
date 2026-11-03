@@ -20,7 +20,7 @@
 
                 <p class="mt-4 text-center text-base text-gris">
                     Vous avez déjà un compte ?
-                    <a href="{{ route('login') }}" class="font-semibold text-marque underline underline-offset-4">Me connecter</a>
+                    <a href="{{ route('login') }}" class="font-semibold text-marine underline underline-offset-4">Me connecter</a>
                 </p>
             </x-ui.barre-action>
         </form>

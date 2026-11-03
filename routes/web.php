@@ -9,6 +9,8 @@ use App\Livewire\Auth\Inscription;
 use App\Livewire\Client\Accueil as AccueilClient;
 use App\Livewire\Livreur\Accueil as AccueilLivreur;
 use Illuminate\Support\Facades\Route;
+use App\Livewire\Client\NouvelleCommande;
+use App\Livewire\Client\SuiviCommande;
 
 Route::get('/', AccueilController::class)->name('accueil');
 
@@ -23,3 +25,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/client', AccueilClient::class)->middleware('role:client')->name('client.accueil');
     Route::get('/livreur', AccueilLivreur::class)->middleware('role:livreur')->name('livreur.accueil');
 });
+
+
+Route::get('/client/commander', NouvelleCommande::class)->middleware('role:client')->name('client.commander');
+Route::get('/client/commandes/{commande:reference}', SuiviCommande::class)->middleware('role:client')->name('client.commande');
