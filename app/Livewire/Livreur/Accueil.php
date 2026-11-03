@@ -6,9 +6,16 @@ namespace App\Livewire\Livreur;
 
 use App\Actions\AccepterAttributionAction;
 use App\Actions\ChangerDisponibiliteLivreurAction;
+use App\Actions\ChangerStatutCommandeAction;
+use App\Actions\ConfirmerLivraisonAction;
+use App\Actions\DeclarerMontantArticlesAction;
 use App\Actions\RefuserAttributionAction;
 use App\Enums\StatutAttribution;
+use App\Enums\StatutCommande;
 use App\Enums\StatutLivreur;
+use App\Enums\TypeCommande;
+use App\Exceptions\CodeLivraisonInvalideException;
+use App\Exceptions\TransitionInvalideException;
 use App\Models\Attribution;
 use App\Models\Commande;
 use App\Models\ProfilLivreur;
@@ -25,6 +32,10 @@ use Livewire\Component;
 class Accueil extends Component
 {
     public string $erreur = '';
+
+    public string $montantArticles = '';
+
+    public string $codeLivraison = '';
 
     #[Computed]
     public function profil(): ProfilLivreur
@@ -62,45 +73,131 @@ class Accueil extends Component
             ->first();
     }
 
+    /** Texte du bouton d'avancement. L'étape finale (livraison) passe par la saisie du code. */
+    #[Computed]
+    public function libelleAction(): ?string
+    {
+        return match ($this->courseEnCours?->statut) {
+            StatutCommande::Acceptee => 'Je pars au retrait',
+            StatutCommande::EnRouteRetrait => 'J\'ai récupéré la commande',
+            StatutCommande::ColisRecupere => 'Je pars livrer',
+            default => null,
+        };
+    }
+
+    /** @return array{livrees: int, caisse: int} */
+    #[Computed]
+    public function bilanDuJour(): array
+    {
+        $livrees = Commande::query()
+            ->duLivreur(auth()->id())
+            ->where('statut', StatutCommande::Livree)
+            ->where('livree_le', '>=', now()->startOfDay())
+            ->count();
+
+        return ['livrees' => $livrees, 'caisse' => $this->profil->solde_caisse];
+    }
+
     public function accepter(int $attributionId, AccepterAttributionAction $accepter): void
     {
-        $this->erreur = '';
         $attribution = Attribution::query()->where('livreur_id', auth()->id())->findOrFail($attributionId);
 
-        try {
-            $accepter->executer($attribution, auth()->user());
-        } catch (DomainException $e) {
-            $this->erreur = $e->getMessage();
-        }
+        $this->tenter(fn () => $accepter->executer($attribution, auth()->user()));
     }
 
     public function refuser(int $attributionId, RefuserAttributionAction $refuser): void
     {
-        $this->erreur = '';
         $attribution = Attribution::query()->where('livreur_id', auth()->id())->findOrFail($attributionId);
 
-        try {
-            $refuser->executer($attribution, auth()->user());
-        } catch (DomainException $e) {
-            $this->erreur = $e->getMessage();
-        }
+        $this->tenter(fn () => $refuser->executer($attribution, auth()->user()));
     }
 
     public function basculer(ChangerDisponibiliteLivreurAction $changer): void
     {
-        $this->erreur = '';
+        $this->tenter(fn () => $changer->executer(auth()->user(), ! $this->estDisponible));
+    }
 
-        try {
-            $changer->executer(auth()->user(), ! $this->estDisponible);
-        } catch (DomainException $e) {
-            $this->erreur = $e->getMessage();
+    public function avancer(ChangerStatutCommandeAction $changer, DeclarerMontantArticlesAction $declarer): void
+    {
+        $course = $this->courseEnCours;
+        $suivant = $course === null ? null : $this->prochainStatut($course->statut);
+
+        if ($suivant === null) {
+            return;
         }
 
-        unset($this->profil, $this->estDisponible);
+        $declareMontant = $suivant === StatutCommande::ColisRecupere && $course->type === TypeCommande::Repas;
+
+        if ($declareMontant) {
+            $this->montantArticles = preg_replace('/\s+/', '', $this->montantArticles) ?? '';
+
+            $this->validate(
+                ['montantArticles' => ['required', 'integer', 'min:0', 'max:200000']],
+                [
+                    'required' => 'Entrez le montant payé pour les articles.',
+                    'integer' => 'Entrez un nombre entier, sans virgule.',
+                    'min' => 'Le montant ne peut pas être négatif.',
+                    'max' => 'Ce montant semble trop élevé.',
+                ],
+            );
+        }
+
+        $this->tenter(function () use ($changer, $declarer, $course, $suivant, $declareMontant): void {
+            if ($declareMontant) {
+                $declarer->executer($course, (int) $this->montantArticles, auth()->user());
+            }
+
+            $changer->executer($course, $suivant, auteur: auth()->user());
+        });
+
+        $this->reset('montantArticles');
+    }
+
+    public function confirmerLivraison(ConfirmerLivraisonAction $confirmer): void
+    {
+        $course = $this->courseEnCours;
+
+        if ($course === null || $course->statut !== StatutCommande::EnRouteLivraison) {
+            return;
+        }
+
+        $this->validate(
+            ['codeLivraison' => ['required', 'digits:4']],
+            ['required' => 'Entrez le code à 4 chiffres donné par le client.', 'digits' => 'Le code a exactement 4 chiffres.'],
+        );
+
+        $this->tenter(fn () => $confirmer->executer($course, $this->codeLivraison, auth()->user()));
+
+        $this->reset('codeLivraison');
     }
 
     public function render(): View
     {
         return view('livewire.livreur.accueil');
+    }
+
+    private function prochainStatut(StatutCommande $statut): ?StatutCommande
+    {
+        return match ($statut) {
+            StatutCommande::Acceptee => StatutCommande::EnRouteRetrait,
+            StatutCommande::EnRouteRetrait => StatutCommande::ColisRecupere,
+            StatutCommande::ColisRecupere => StatutCommande::EnRouteLivraison,
+            default => null,
+        };
+    }
+
+    /** Exécute une opération métier et affiche son erreur éventuelle en français. */
+    private function tenter(callable $operation): void
+    {
+        $this->erreur = '';
+
+        try {
+            $operation();
+        } catch (TransitionInvalideException|CodeLivraisonInvalideException|DomainException $e) {
+            $this->erreur = $e->getMessage();
+        }
+
+        // Sans cela, l'affichage reprendrait les valeurs mises en cache avant le changement
+        unset($this->profil, $this->estDisponible, $this->offres, $this->courseEnCours, $this->libelleAction, $this->bilanDuJour);
     }
 }
