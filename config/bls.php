@@ -42,4 +42,9 @@ return [
     'sms' => [
         'driver' => env('SMS_DRIVER', 'journal'),
     ],
+
+    'couleurs' => [
+        'marine' => '#011F48',
+        'ambre' => '#F1AE06',
+    ],
 ];

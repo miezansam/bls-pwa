@@ -1,0 +1,33 @@
+{
+    "id": "/",
+    "name": "Béni Livraison Service",
+    "short_name": "BLS",
+    "description": "Livraison de colis et de repas à Adzopé et dans les villages voisins.",
+    "lang": "fr",
+    "start_url": "/",
+    "scope": "/",
+    "display": "standalone",
+    "orientation": "portrait",
+    "background_color": "#011f48",
+    "theme_color": "#011f48",
+    "icons": [
+        {
+            "src": "/images/icons/icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "/images/icons/icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "/images/icons/icon-maskable-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "maskable"
+        }
+    ]
+}

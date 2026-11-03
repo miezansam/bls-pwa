@@ -30,7 +30,10 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
-            ->brandName('BLS Livraison')
+            ->brandName('Béni Livraison Service')
+            ->brandLogo(asset('identite/logo-couleur.png'))
+            ->brandLogoHeight('2rem')
+            ->favicon(asset('identite/favicon.ico'))
             ->colors([
                 'primary' => Color::Amber,
             ])

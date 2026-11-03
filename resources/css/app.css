@@ -20,10 +20,10 @@
     --color-gris: #5c635e;
     --color-trait: #d6d9d3;
     --color-fond: #f1f2ef;
-    --color-marque: #1f6f3b;
-    --color-marque-fonce: #175530;
-    --color-signal: #ffc20e;
     --color-alerte: #b42318;
+    
+    --color-marine: #011F48;
+    --color-ambre: #F1AE06;
 }
 
 @layer base {

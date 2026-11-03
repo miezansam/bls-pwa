@@ -43,9 +43,7 @@ final class OtpService
             try {
                 // Message sans accent : reste dans un seul SMS (alphabet GSM, 160 caractères)
                 $this->sms->envoyer($telephone, sprintf(
-                    'BLS Livraison: votre code est %s. Valable %d minutes. Ne le partagez avec personne.',
-                    $code,
-                    $minutes,
+                    "BLS : votre code est {$code}. Valable 5 minutes. Ne le partagez avec personne."
                 ));
             } catch (Throwable $e) {
                 // L'échec n'est pas la faute de l'utilisateur : on ne compte pas ce code dans ses limites

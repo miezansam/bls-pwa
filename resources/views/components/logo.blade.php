@@ -1,16 +1,17 @@
-@props(['surFond' => 'clair'])
+@props(['variante' => 'inverse', 'largeur' => 130])
 
 @php
-    $fichier = collect(['svg', 'png', 'webp'])->first(fn (string $extension) => file_exists(public_path("images/logo.{$extension}")));
+    $fichier = match ($variante) {
+        'inverse' => 'logo-inverse.png',
+        'compact-inverse' => 'logo-compact-inverse.png',
+        'compact' => 'logo-compact.png',
+        default => 'logo.png',
+    };
 @endphp
 
-@if ($fichier)
-    {{-- Sur fond sombre, le logo est posé sur une plaque blanche pour rester lisible --}}
-    <span @class(['inline-block', 'rounded-sm bg-white p-2' => $surFond === 'sombre'])>
-        <img src="{{ asset("images/logo.{$fichier}") }}" alt="BLS Livraison" {{ $attributes->class(['w-auto']) }}>
-    </span>
-@else
-    <span {{ $attributes->class(['font-display font-bold leading-none tracking-tight', 'text-white' => $surFond === 'sombre', 'text-encre' => $surFond !== 'sombre']) }}>
-        BLS Livraison
-    </span>
-@endif
+<img
+    src="{{ asset('images/'.$fichier) }}"
+    alt="Béni Livraison Service"
+    width="{{ $largeur }}"
+    {{ $attributes->class(['h-auto max-w-full']) }}
+>
