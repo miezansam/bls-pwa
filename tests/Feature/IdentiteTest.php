@@ -46,3 +46,10 @@ it('n\'a aucune couleur en dur ni reste de vert dans les vues', function () {
             ->and($contenu)->not->toMatch('/(bg|text|border)-(green|vert)/', $fichier->getFilename());
     }
 });
+
+it('rend le bouton principal de connexion avec une balise bien fermée', function () {
+    $html = $this->get('/connexion')->assertOk()->getContent();
+
+    expect($html)->toContain('Recevoir mon code')
+        ->and($html)->not->toMatch('/<button[^>]*<svg/s');
+});
