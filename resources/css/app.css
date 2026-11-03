@@ -10,7 +10,7 @@
 @source '../**/*.blade.php';
 @source '../**/*.js';
 
-/* Identité visuelle : couleurs provisoires, tirées des affiches de l'association.
+/* Identité visuelle : couleurs du logo BLS (marine et ambre).
    Pour changer l'apparence de toute l'application, on ne modifie que ce bloc. */
 @theme {
     --font-sans: "Barlow", ui-sans-serif, system-ui, sans-serif;
