@@ -9,7 +9,7 @@
 <div>
     <h1 class="font-display text-4xl font-bold">Nouvelle commande</h1>
 
-    <form wire:submit="enregistrer" class="mt-6 flex flex-col gap-8 pb-32">
+    <form wire:submit="enregistrer" class="mt-6 flex flex-col gap-8 ">
         <fieldset>
             <legend class="mb-2 font-semibold">Que voulez-vous envoyer ?</legend>
             <div class="grid grid-cols-2 gap-3">
@@ -121,7 +121,7 @@
             @endif
         </div>
 
-        <x-ui.barre-action>
+        <x-ui.barre-action class="-mx-5 -mb-6 lg:mx-0 lg:mb-0">
             <x-ui.bouton cible="enregistrer">Commander</x-ui.bouton>
         </x-ui.barre-action>
     </form>

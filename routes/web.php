@@ -11,6 +11,7 @@ use App\Livewire\Livreur\Accueil as AccueilLivreur;
 use Illuminate\Support\Facades\Route;
 use App\Livewire\Client\NouvelleCommande;
 use App\Livewire\Client\SuiviCommande;
+use App\Http\Controllers\PositionLivreurController;
 
 Route::get('/', AccueilController::class)->name('accueil');
 
@@ -29,3 +30,8 @@ Route::middleware('auth')->group(function () {
 
 Route::get('/client/commander', NouvelleCommande::class)->middleware('role:client')->name('client.commander');
 Route::get('/client/commandes/{commande:reference}', SuiviCommande::class)->middleware('role:client')->name('client.commande');
+
+
+Route::post('/livreur/position', PositionLivreurController::class)
+        ->middleware(['role:livreur', 'throttle:60,1'])
+        ->name('livreur.position');

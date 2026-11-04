@@ -62,6 +62,13 @@
                 </div>
             </dl>
 
+            <div x-data="suiviGps({ url: @js(route('livreur.position')), intervalle: @js(config('bls.gps.intervalle_envoi_secondes')) })"
+                class="mt-4 border-l-4 py-1 pl-3 text-base"
+                :class="['refuse', 'session', 'indisponible', 'erreur', 'ecartee'].includes(etat) ? 'border-alerte text-alerte' : 'border-ambre'"
+                role="status">
+                <span class="font-semibold">Suivi GPS :</span> <span x-text="message"></span>
+            </div>
+
             @if ($course->statut === \App\Enums\StatutCommande::EnRouteRetrait && $course->type === \App\Enums\TypeCommande::Repas)
                 <div class="mt-6">
                     <x-ui.champ nom="montantArticles" label="Montant payé pour les articles (FCFA)"

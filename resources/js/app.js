@@ -8,3 +8,4 @@
 
 import './echo';
 import './carte-epingle';
+import './suivi-gps';

@@ -52,4 +52,16 @@ return [
 
 
     'carte_limites' => ['latitude' => [5.6, 6.6], 'longitude' => [-4.4, -3.3]],
+
+    // Suivi GPS du livreur (dernière position dans Redis, historique en base)
+    'gps' => [
+        'store' => env('GPS_STORE', 'redis'),
+        'intervalle_envoi_secondes' => 4,
+        'precision_max_m' => (int) env('GPS_PRECISION_MAX_M', 100),
+        'vitesse_max_kmh' => 120,
+        'age_max_secondes' => 600,
+        'ttl_position_secondes' => 180,
+        'intervalle_historique_secondes' => 30,
+        'verifier_region' => (bool) env('GPS_VERIFIER_REGION', true),
+    ],
 ];
