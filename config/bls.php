@@ -49,4 +49,7 @@ return [
     ],
 
     'centre_defaut' => ['latitude' => 6.1067, 'longitude' => -3.8606],
+
+
+    'carte_limites' => ['latitude' => [5.6, 6.6], 'longitude' => [-4.4, -3.3]],
 ];

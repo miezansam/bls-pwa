@@ -114,3 +114,51 @@ it('propose de commander et de suivre la commande en cours depuis l\'accueil', f
         ->assertSee('Commande en cours')
         ->assertSee($commande->reference);
 });
+
+it('enregistre l\'épingle du client à la place du centre de la zone', function () {
+    $this->travelTo('2026-11-04 12:00:00');
+
+    Livewire::actingAs(clientConnecte())
+        ->test(NouvelleCommande::class)
+        ->set(formulaire($this->ville, $this->ville))
+        ->set('livraisonLatitude', 6.1188)
+        ->set('livraisonLongitude', -3.8512)
+        ->call('enregistrer')
+        ->assertHasNoErrors();
+
+    $commande = Commande::query()->firstOrFail();
+
+    expect($commande->livraison_latitude)->toEqualWithDelta(6.1188, 0.0001)
+        ->and($commande->livraison_longitude)->toEqualWithDelta(-3.8512, 0.0001);
+});
+
+it('utilise le centre de la zone quand il n\'y a pas d\'épingle', function () {
+    $this->travelTo('2026-11-04 12:00:00');
+
+    Livewire::actingAs(clientConnecte())
+        ->test(NouvelleCommande::class)
+        ->set(formulaire($this->ville, $this->ville))
+        ->call('enregistrer');
+
+    $attendu = (float) ($this->ville->centre_latitude ?? config('bls.centre_defaut.latitude'));
+
+    expect(Commande::query()->firstOrFail()->retrait_latitude)->toEqualWithDelta($attendu, 0.0001);
+});
+
+it('refuse une épingle hors de la région et une épingle incomplète', function () {
+    $this->travelTo('2026-11-04 12:00:00');
+
+    Livewire::actingAs(clientConnecte())
+        ->test(NouvelleCommande::class)
+        ->set(formulaire($this->ville, $this->ville))
+        ->set('livraisonLatitude', 48.85)
+        ->set('livraisonLongitude', 2.35)
+        ->call('enregistrer')
+        ->assertHasErrors('livraisonLatitude')
+        ->set('livraisonLatitude', null)
+        ->set('livraisonLongitude', -3.85)
+        ->call('enregistrer')
+        ->assertHasErrors('livraisonLatitude');
+
+    expect(Commande::query()->count())->toBe(0);
+});

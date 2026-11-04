@@ -13,6 +13,7 @@ use App\Exceptions\TarifIntrouvableException;
 use App\Models\Zone;
 use App\Services\CalculerPrixService;
 use DomainException;
+use Illuminate\Contracts\View\View;
 use Illuminate\Support\Collection;
 use Illuminate\Validation\Rule;
 use Livewire\Attributes\Computed;
@@ -48,6 +49,14 @@ class NouvelleCommande extends Component
 
     public string $nombreRepas = '1';
 
+    public ?float $retraitLatitude = null;
+
+    public ?float $retraitLongitude = null;
+
+    public ?float $livraisonLatitude = null;
+
+    public ?float $livraisonLongitude = null;
+
     public function mount(): void
     {
         $this->retraitTelephone = (string) auth()->user()->telephone;
@@ -69,15 +78,15 @@ class NouvelleCommande extends Component
     #[Computed]
     public function estimation(): array
     {
-        $retrait = $this->zones->firstWhere('id', (int) $this->retraitZoneId);
-        $livraison = $this->zones->firstWhere('id', (int) $this->livraisonZoneId);
+        $retrait = $this->zone($this->retraitZoneId);
+        $livraison = $this->zone($this->livraisonZoneId);
 
         if ($retrait === null || $livraison === null) {
             return ['prix' => null, 'erreur' => null];
         }
 
-        [$retraitLat, $retraitLng] = $this->position($retrait);
-        [$livraisonLat, $livraisonLng] = $this->position($livraison);
+        [$retraitLat, $retraitLng] = $this->position($retrait, $this->retraitLatitude, $this->retraitLongitude);
+        [$livraisonLat, $livraisonLng] = $this->position($livraison, $this->livraisonLatitude, $this->livraisonLongitude);
 
         try {
             $prix = app(CalculerPrixService::class)->estimer(
@@ -90,7 +99,7 @@ class NouvelleCommande extends Component
                 livraisonLongitude: $livraisonLng,
                 options: $this->options(),
             );
-        } catch (LivraisonNonDisponibleException|TarifIntrouvableException|DomainException $e) {
+        } catch (LivraisonNonDisponibleException | TarifIntrouvableException | DomainException $e) {
             return ['prix' => null, 'erreur' => $e->getMessage()];
         }
 
@@ -101,10 +110,17 @@ class NouvelleCommande extends Component
     {
         $this->validate();
 
-        $retrait = $this->zones->firstWhere('id', (int) $this->retraitZoneId);
-        $livraison = $this->zones->firstWhere('id', (int) $this->livraisonZoneId);
-        [$retraitLat, $retraitLng] = $this->position($retrait);
-        [$livraisonLat, $livraisonLng] = $this->position($livraison);
+        $retrait = $this->zone($this->retraitZoneId);
+        $livraison = $this->zone($this->livraisonZoneId);
+
+        if ($retrait === null || $livraison === null) {
+            $this->addError('livraisonZoneId', 'Choisissez une zone valide.');
+
+            return;
+        }
+
+        [$retraitLat, $retraitLng] = $this->position($retrait, $this->retraitLatitude, $this->retraitLongitude);
+        [$livraisonLat, $livraisonLng] = $this->position($livraison, $this->livraisonLatitude, $this->livraisonLongitude);
 
         $options = $this->options();
 
@@ -138,7 +154,7 @@ class NouvelleCommande extends Component
                 'nombre_repas' => $options->nombreRepas,
                 'montant_articles' => 0,
             ]);
-        } catch (LivraisonNonDisponibleException|TarifIntrouvableException|DomainException $e) {
+        } catch (LivraisonNonDisponibleException | TarifIntrouvableException | DomainException $e) {
             $this->addError('livraisonZoneId', $e->getMessage());
 
             return;
@@ -147,7 +163,7 @@ class NouvelleCommande extends Component
         $this->redirectRoute('client.commande', ['commande' => $commande->reference]);
     }
 
-    public function render()
+    public function render(): View
     {
         return view('livewire.client.nouvelle-commande');
     }
@@ -155,6 +171,9 @@ class NouvelleCommande extends Component
     /** @return array<string, mixed> */
     protected function rules(): array
     {
+        $limites = config('bls.carte_limites');
+        $latitude = ['nullable', 'numeric', 'between:' . implode(',', $limites['latitude'])];
+        $longitude = ['nullable', 'numeric', 'between:' . implode(',', $limites['longitude'])];
         $zoneActive = Rule::exists('zones', 'id')->where('est_active', true);
         $telephone = ['required', 'regex:/^[0-9 +]{10,16}$/'];
 
@@ -168,6 +187,10 @@ class NouvelleCommande extends Component
             'livraisonTelephone' => $telephone,
             'description' => ['required', 'string', 'max:1000'],
             'nombreRepas' => ['required', 'integer', 'min:1', 'max:20'],
+            'retraitLatitude' => [...$latitude, 'required_with:retraitLongitude'],
+            'retraitLongitude' => [...$longitude, 'required_with:retraitLatitude'],
+            'livraisonLatitude' => [...$latitude, 'required_with:livraisonLongitude'],
+            'livraisonLongitude' => [...$longitude, 'required_with:livraisonLatitude'],
         ];
     }
 
@@ -178,7 +201,15 @@ class NouvelleCommande extends Component
             'required' => 'Ce champ est obligatoire.',
             'retraitTelephone.regex' => 'Entrez un numéro valide, par exemple 07 00 00 00 00.',
             'livraisonTelephone.regex' => 'Entrez un numéro valide, par exemple 07 00 00 00 00.',
+            'between' => 'Ce point est trop éloigné d\'Adzopé. Replacez l\'épingle.',
+            'numeric' => 'Position invalide. Replacez l\'épingle.',
+            'required_with' => 'Replacez l\'épingle sur la carte.',
         ];
+    }
+
+    private function zone(string $id): ?Zone
+    {
+        return $id === '' ? null : Zone::query()->where('est_active', true)->find((int) $id);
     }
 
     private function options(): OptionsCommande
@@ -191,9 +222,17 @@ class NouvelleCommande extends Component
         );
     }
 
-    /** Position provisoire : le centre de la zone, remplacé par l'épingle à l'étape 4. */
-    private function position(Zone $zone): array
+    /**
+     * Épingle du client si elle existe, sinon le centre de la zone.
+     *
+     * @return array{0: float, 1: float}
+     */
+    private function position(Zone $zone, ?float $latitude, ?float $longitude): array
     {
+        if ($latitude !== null && $longitude !== null) {
+            return [$latitude, $longitude];
+        }
+
         return [
             (float) ($zone->centre_latitude ?? config('bls.centre_defaut.latitude')),
             (float) ($zone->centre_longitude ?? config('bls.centre_defaut.longitude')),
