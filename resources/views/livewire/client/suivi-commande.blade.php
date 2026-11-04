@@ -1,4 +1,4 @@
-<div wire:poll.20s>
+<div wire:poll.60s>
     <p class="text-gris">Commande {{ $commande->reference }}</p>
     <h1 class="font-display text-4xl font-bold">{{ $commande->statut->libelle() }}</h1>
     <div class="mt-6 border-y-2 border-marine py-4">

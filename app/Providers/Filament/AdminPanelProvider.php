@@ -31,9 +31,9 @@ class AdminPanelProvider extends PanelProvider
             ->path('admin')
             ->login()
             ->brandName('Béni Livraison Service')
-            ->brandLogo(asset('identite/logo-couleur.png'))
             ->brandLogoHeight('2rem')
-            ->favicon(asset('identite/favicon.ico'))
+            ->brandLogo(asset('images/logo-compact.png'))
+            ->favicon(asset('favicon.ico'))
             ->colors([
                 'primary' => Color::Amber,
             ])

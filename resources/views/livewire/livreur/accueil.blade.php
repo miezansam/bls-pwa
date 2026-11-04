@@ -1,4 +1,4 @@
-<div wire:poll.15s class="space-y-8">
+<div wire:poll.30s class="space-y-8">
     <div class="space-y-3">
         <h1 class="font-display text-4xl font-bold leading-none">Bonjour {{ auth()->user()->nom }}</h1>
 

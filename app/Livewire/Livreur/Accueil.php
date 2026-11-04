@@ -193,11 +193,22 @@ class Accueil extends Component
 
         try {
             $operation();
-        } catch (TransitionInvalideException|CodeLivraisonInvalideException|DomainException $e) {
+        } catch (TransitionInvalideException | CodeLivraisonInvalideException | DomainException $e) {
             $this->erreur = $e->getMessage();
         }
 
         // Sans cela, l'affichage reprendrait les valeurs mises en cache avant le changement
         unset($this->profil, $this->estDisponible, $this->offres, $this->courseEnCours, $this->libelleAction, $this->bilanDuJour);
+    }
+
+    /** @return array<string, string> */
+    public function getListeners(): array
+    {
+        $canal = 'echo-private:livreur.' . auth()->id();
+
+        return [
+            $canal . ',.offre.proposee' => '$refresh',
+            $canal . ',.statut.change' => '$refresh',
+        ];
     }
 }

@@ -14,6 +14,7 @@ use App\Models\ProfilLivreur;
 use App\Models\Utilisateur;
 use DomainException;
 use Illuminate\Support\Facades\DB;
+use App\Events\OffreProposee;
 
 final class AttribuerCommandeAction
 {
@@ -53,6 +54,8 @@ final class AttribuerCommandeAction
             ]);
 
             $verrouillee->update(['attribuee_le' => now()]);
+
+            OffreProposee::dispatch($attribution);
 
             return $attribution;
         });
