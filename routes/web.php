@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Route;
 use App\Livewire\Client\NouvelleCommande;
 use App\Livewire\Client\SuiviCommande;
 use App\Http\Controllers\PositionLivreurController;
+use App\Http\Controllers\ServiceWorkerController;
 
 Route::get('/', AccueilController::class)->name('accueil');
 
@@ -35,3 +36,6 @@ Route::get('/client/commandes/{commande:reference}', SuiviCommande::class)->midd
 Route::post('/livreur/position', PositionLivreurController::class)
         ->middleware(['role:livreur', 'throttle:60,1'])
         ->name('livreur.position');
+
+Route::get('/sw.js', ServiceWorkerController::class)->name('service-worker');
+Route::view('/hors-ligne', 'hors-ligne')->name('hors-ligne');
