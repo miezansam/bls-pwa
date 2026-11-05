@@ -129,7 +129,9 @@ it('enregistre l\'épingle du client à la place du centre de la zone', function
     $commande = Commande::query()->firstOrFail();
 
     expect($commande->livraison_latitude)->toEqualWithDelta(6.1188, 0.0001)
-        ->and($commande->livraison_longitude)->toEqualWithDelta(-3.8512, 0.0001);
+        ->and($commande->livraison_longitude)->toEqualWithDelta(-3.8512, 0.0001)
+        ->and($commande->livraison_epingle)->toBeTrue()
+        ->and($commande->retrait_epingle)->toBeFalse();
 });
 
 it('utilise le centre de la zone quand il n\'y a pas d\'épingle', function () {

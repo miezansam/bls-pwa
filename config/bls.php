@@ -64,4 +64,12 @@ return [
         'intervalle_historique_secondes' => 30,
         'verifier_region' => (bool) env('GPS_VERIFIER_REGION', true),
     ],
+
+    // Estimation d'arrivée : OSRM, avec repli sur l'estimation à vol d'oiseau
+    'itineraire' => [
+        'url' => env('OSRM_URL', 'https://router.project-osrm.org'),
+        'timeout_secondes' => 3,
+        'cache_secondes' => 60,
+        'eta_max_minutes' => 120,
+    ],
 ];

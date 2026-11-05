@@ -135,6 +135,7 @@ class NouvelleCommande extends Component
                     'repere' => $this->retraitRepere,
                     'contact_nom' => null,
                     'contact_telephone' => $this->retraitTelephone,
+                    'epingle' => $this->retraitLatitude !== null && $this->retraitLongitude !== null,
                 ],
                 'livraison' => [
                     'zone_id' => $livraison->id,
@@ -144,6 +145,7 @@ class NouvelleCommande extends Component
                     'repere' => $this->livraisonRepere,
                     'contact_nom' => null,
                     'contact_telephone' => $this->livraisonTelephone,
+                    'epingle' => $this->livraisonLatitude !== null && $this->livraisonLongitude !== null,
                 ],
                 'description' => $this->description,
                 'photo_chemin' => null,

@@ -36,6 +36,12 @@
                         <a href="tel:{{ preg_replace('/\s+/', '', $course->retrait_contact_telephone) }}"
                            class="font-semibold text-marine underline underline-offset-4">{{ $course->retrait_contact_telephone }}</a>
                     </dd>
+                    @if ($course->retrait_epingle)
+                        <dd>
+                            <a href="geo:{{ $course->retrait_latitude }},{{ $course->retrait_longitude }}?q={{ $course->retrait_latitude }},{{ $course->retrait_longitude }}"
+                               class="font-semibold text-marine underline underline-offset-4">Ouvrir sur la carte</a>
+                        </dd>
+                    @endif
                 </div>
                 <div>
                     <dt class="text-gris">Livraison</dt>
@@ -44,6 +50,12 @@
                         <a href="tel:{{ preg_replace('/\s+/', '', $course->livraison_contact_telephone) }}"
                            class="font-semibold text-marine underline underline-offset-4">{{ $course->livraison_contact_telephone }}</a>
                     </dd>
+                    @if ($course->livraison_epingle)
+                        <dd>
+                            <a href="geo:{{ $course->livraison_latitude }},{{ $course->livraison_longitude }}?q={{ $course->livraison_latitude }},{{ $course->livraison_longitude }}"
+                               class="font-semibold text-marine underline underline-offset-4">Ouvrir sur la carte</a>
+                        </dd>
+                    @endif
                 </div>
                 <div>
                     <dt class="text-gris">À livrer</dt>
@@ -63,9 +75,9 @@
             </dl>
 
             <div x-data="suiviGps({ url: @js(route('livreur.position')), intervalle: @js(config('bls.gps.intervalle_envoi_secondes')) })"
-                class="mt-4 border-l-4 py-1 pl-3 text-base"
-                :class="['refuse', 'session', 'indisponible', 'erreur', 'ecartee'].includes(etat) ? 'border-alerte text-alerte' : 'border-ambre'"
-                role="status">
+                 class="mt-4 border-l-4 py-1 pl-3 text-base"
+                 :class="['refuse', 'session', 'indisponible', 'erreur', 'ecartee'].includes(etat) ? 'border-alerte text-alerte' : 'border-ambre'"
+                 role="status">
                 <span class="font-semibold">Suivi GPS :</span> <span x-text="message"></span>
             </div>
 
