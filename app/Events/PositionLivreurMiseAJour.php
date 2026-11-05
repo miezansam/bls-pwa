@@ -31,9 +31,13 @@ final class PositionLivreurMiseAJour implements ShouldBroadcastNow
         return 'position.change';
     }
 
-    /** @return array{latitude: float, longitude: float, mesure_s: int} */
+    /** @return array{latitude: float, longitude: float, age_s: int} */
     public function broadcastWith(): array
     {
-        return ['latitude' => $this->latitude, 'longitude' => $this->longitude, 'mesure_s' => $this->mesureS];
+        return [
+            'latitude' => $this->latitude,
+            'longitude' => $this->longitude,
+            'age_s' => max(0, now()->getTimestamp() - $this->mesureS),
+        ];
     }
 }

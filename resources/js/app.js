@@ -9,3 +9,4 @@
 import './echo';
 import './carte-epingle';
 import './suivi-gps';
+import './carte-suivi';

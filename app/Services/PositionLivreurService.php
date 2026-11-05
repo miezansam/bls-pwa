@@ -157,4 +157,20 @@ final class PositionLivreurService
     {
         return 'position:livreur:' . $livreurId;
     }
+
+    /** @return array{latitude: float, longitude: float, age_s: int}|null */
+    public function derniereAvecAge(int $livreurId): ?array
+    {
+        $position = $this->cache()->get(self::cle($livreurId));
+
+        if ($position === null) {
+            return null;
+        }
+
+        return [
+            'latitude' => $position['latitude'],
+            'longitude' => $position['longitude'],
+            'age_s' => max(0, now()->getTimestamp() - $position['mesure_s']),
+        ];
+    }
 }
